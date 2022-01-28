@@ -12,6 +12,7 @@ import {
 import { Box } from "@mui/system";
 import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
+import { v4 as uuidv4 } from "uuid";
 
 const Quiz = () => {
   //mui
@@ -26,6 +27,8 @@ const Quiz = () => {
   const [userAnswer, setUserAnswer] = useState(options[0]);
   const [correctAns, setCorrectAns] = useState(null);
   const [button, setButton] = useState("check answer");
+  const [showFeedBack, setShowFeedBack] = useState(false);
+  const [userRes, setUserRes] = useState(null);
 
   //functions
   const handleShuffle = (optionss) => {
@@ -50,24 +53,28 @@ const Quiz = () => {
   };
 
   const handleClick = () => {
+    setShowFeedBack(true);
     if (button === "check answer") {
       if (userAnswer === correctAns) {
-        console.log(true);
+        setUserRes(`Correct answer!`);
       } else {
-        console.log(false);
+        setUserRes(`Incorrect answer: ${correctAns}`);
       }
       setButton("next question");
+      return;
     }
     if (button === "next question") {
       setCurrentQues(currentQues + 1);
+      setCorrectAns(questions[currentQues + 1].correct_answer);
       setOptions(
         handleShuffle([
-          questions[currentQues].correct_answer,
-          ...questions[currentQues].incorrect_answers,
+          questions[currentQues + 1].correct_answer,
+          ...questions[currentQues + 1].incorrect_answers,
         ])
       );
-      console.log(options);
+      setShowFeedBack(false);
       setButton("check answer");
+      return;
     }
   };
 
@@ -88,12 +95,12 @@ const Quiz = () => {
             sx={{
               borderRadius: 5,
               p: 5,
-              pt: 7,
               border: 1,
               display: "flex",
               flexDirection: "column",
               alignItems: "flex-start",
               gap: 2,
+              width: "100%",
               maxWidth: "700px",
             }}
           >
@@ -109,6 +116,7 @@ const Quiz = () => {
                 {options.map((option) => {
                   return (
                     <FormControlLabel
+                      key={uuidv4()}
                       value={option}
                       control={<Radio />}
                       label={option}
@@ -117,6 +125,17 @@ const Quiz = () => {
                 })}
               </RadioGroup>
             </FormControl>
+            {showFeedBack && (
+              <Typography
+                backgroundColor={`${
+                  userAnswer === correctAns ? "#00e676" : "#ff1744"
+                }`}
+                padding={1}
+                borderRadius={1}
+              >
+                {userRes}
+              </Typography>
+            )}
             <Button
               variant='contained'
               onClick={handleClick}
