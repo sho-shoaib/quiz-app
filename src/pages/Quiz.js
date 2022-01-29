@@ -8,13 +8,24 @@ import {
   FormControlLabel,
   Radio,
   useMediaQuery,
+  TextField,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material/styles";
 import { v4 as uuidv4 } from "uuid";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import { useHistory } from "react-router-dom";
 
 const Quiz = () => {
+  const history = useHistory();
+
   //mui
   const theme = useTheme();
   const Xsmall = useMediaQuery(theme.breakpoints.down("sm"));
@@ -29,6 +40,9 @@ const Quiz = () => {
   const [button, setButton] = useState("check answer");
   const [showFeedBack, setShowFeedBack] = useState(false);
   const [userRes, setUserRes] = useState(null);
+  const [incorrectCount, setIncorrectCount] = useState(0);
+  const [gameEnd, setGameEnd] = useState(false);
+  const [name, setName] = useState("");
 
   //functions
   const handleShuffle = (optionss) => {
@@ -38,7 +52,7 @@ const Quiz = () => {
   const fetchData = async () => {
     setLoading(true);
     const data = await fetch(
-      "https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=multiple"
+      "https://opentdb.com/api.php?amount=3&category=18&difficulty=easy&type=multiple"
     );
     const res = await data.json();
     setQuestions(handleShuffle(res.results));
@@ -58,12 +72,19 @@ const Quiz = () => {
       if (userAnswer === correctAns) {
         setUserRes(`Correct answer!`);
       } else {
+        setIncorrectCount((prev) => {
+          return prev + 1;
+        });
         setUserRes(`Incorrect answer: ${correctAns}`);
       }
       setButton("next question");
       return;
     }
     if (button === "next question") {
+      if (currentQues > 1) {
+        setGameEnd(true);
+        return;
+      }
       setCurrentQues(currentQues + 1);
       setCorrectAns(questions[currentQues + 1].correct_answer);
       setOptions(
@@ -78,10 +99,99 @@ const Quiz = () => {
     }
   };
 
+  const handleClickEnd = () => {
+    history.push("/");
+  };
+
   //hooks
   useEffect(() => {
     fetchData();
   }, []);
+
+  if (gameEnd) {
+    return (
+      <>
+        <Container
+          sx={{ height: "90vh", display: "grid", placeItems: "center" }}
+        >
+          <Box
+            className='mid-box'
+            sx={{
+              borderRadius: 5,
+              p: 5,
+              border: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+              gap: 2,
+              width: "100%",
+              maxWidth: "700px",
+            }}
+          >
+            <Typography variant={`${Xsmall ? "h5" : "h4"}`} fontWeight='600'>
+              Your score:
+            </Typography>
+            <TextField
+              id='standard-basic'
+              label='Name'
+              variant='standard'
+              onChange={(e) => setName(e.target.value)}
+            />
+
+            <TableContainer component={Paper}>
+              <Table sx={{ maxWidth: "100%" }} aria-label='simple table'>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Incorrect</TableCell>
+                    <TableCell>Correct</TableCell>
+                    <TableCell>Time</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component='th' scope='row'>
+                      {name}
+                    </TableCell>
+                    <TableCell>{incorrectCount}</TableCell>
+                    <TableCell>{10 - incorrectCount}</TableCell>
+                    <TableCell>40</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <Box sx={{ display: "flex", gap: "20px" }}>
+              <Button
+                variant='contained'
+                onClick={() => history.push("/highscores")}
+                sx={{
+                  backgroundColor: "var(--main)",
+                  display: "block",
+                  "&:hover": { backgroundColor: "var(--main)" },
+                }}
+              >
+                view highscores
+              </Button>
+              <Button
+                variant='contained'
+                onClick={handleClickEnd}
+                sx={{
+                  backgroundColor: "var(--main)",
+                  display: "block",
+                  "&:hover": { backgroundColor: "var(--main)" },
+                }}
+              >
+                home
+              </Button>
+            </Box>
+          </Box>
+        </Container>
+      </>
+    );
+  }
 
   //returns
   if (!loading) {

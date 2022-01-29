@@ -4,8 +4,11 @@ import AppBar from "@mui/material/AppBar";
 import Typography from "@mui/material/Typography";
 import { Button, Container } from "@mui/material";
 import { Box } from "@mui/system";
+import { useHistory } from "react-router-dom";
 
 const Navbar = () => {
+  const history = useHistory();
+
   return (
     <>
       <AppBar position='static' sx={{ backgroundColor: "var(--main)" }}>
@@ -15,6 +18,7 @@ const Navbar = () => {
               variant='h6'
               component='div'
               sx={{ textDecoration: "underline", cursor: "pointer" }}
+              onClick={() => history.push("/highscores")}
             >
               View highscores
             </Typography>
