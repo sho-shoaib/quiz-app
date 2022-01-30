@@ -22,8 +22,10 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { useHistory } from "react-router-dom";
+import { useGlobalContext } from "../Context";
 
 const Quiz = () => {
+  const { setPauseTimer, seconds, setSeconds } = useGlobalContext();
   const history = useHistory();
 
   //mui
@@ -50,6 +52,7 @@ const Quiz = () => {
   };
 
   const fetchData = async () => {
+    setPauseTimer(true);
     setLoading(true);
     const data = await fetch(
       "https://opentdb.com/api.php?amount=3&category=18&difficulty=easy&type=multiple"
@@ -64,14 +67,17 @@ const Quiz = () => {
       ])
     );
     setLoading(false);
+    setPauseTimer(false);
   };
 
   const handleClick = () => {
     setShowFeedBack(true);
     if (button === "check answer") {
+      setPauseTimer(true);
       if (userAnswer === correctAns) {
         setUserRes(`Correct answer!`);
       } else {
+        setSeconds(seconds + 10);
         setIncorrectCount((prev) => {
           return prev + 1;
         });
@@ -81,7 +87,9 @@ const Quiz = () => {
       return;
     }
     if (button === "next question") {
+      setPauseTimer(false);
       if (currentQues > 1) {
+        setPauseTimer(true);
         setGameEnd(true);
         return;
       }
@@ -157,7 +165,7 @@ const Quiz = () => {
                     </TableCell>
                     <TableCell>{incorrectCount}</TableCell>
                     <TableCell>{10 - incorrectCount}</TableCell>
-                    <TableCell>40</TableCell>
+                    <TableCell>{seconds}s</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -173,7 +181,7 @@ const Quiz = () => {
                   "&:hover": { backgroundColor: "var(--main)" },
                 }}
               >
-                view highscores
+                add score
               </Button>
               <Button
                 variant='contained'

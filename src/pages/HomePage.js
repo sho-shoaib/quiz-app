@@ -1,14 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Container } from "@mui/material";
 import { Box } from "@mui/system";
 import Typography from "@mui/material/Typography";
 import { useHistory } from "react-router-dom";
+import { useGlobalContext } from "../Context";
 
 const HomePage = () => {
   const history = useHistory();
 
+  const { setStartTimer } = useGlobalContext();
+
   const handleClick = () => {
     history.push("/quiz");
+    setStartTimer(true);
   };
 
   return (
