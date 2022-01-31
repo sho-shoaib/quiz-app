@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Container } from "@mui/material";
 import { Box } from "@mui/system";
 import Typography from "@mui/material/Typography";
@@ -8,12 +8,16 @@ import { useGlobalContext } from "../Context";
 const HomePage = () => {
   const history = useHistory();
 
-  const { setStartTimer } = useGlobalContext();
+  const { setStartTimer, setSeconds } = useGlobalContext();
 
   const handleClick = () => {
     history.push("/quiz");
     setStartTimer(true);
   };
+
+  useEffect(() => {
+    setSeconds(0);
+  }, []);
 
   return (
     <>
@@ -32,7 +36,7 @@ const HomePage = () => {
           }}
         >
           <Typography variant='h4' fontWeight='600'>
-            Coding Quiz Challenge
+            Computer Quiz Challenge
           </Typography>
           <Typography>
             Try to answer to the following computer-related questions within the

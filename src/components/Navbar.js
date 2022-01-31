@@ -14,6 +14,14 @@ const Navbar = () => {
 
   const { seconds, onQuiz } = useGlobalContext();
 
+  const handleClick = () => {
+    if (location.pathname === "/highscores") {
+      history.push("/");
+    } else {
+      history.push("/highscores");
+    }
+  };
+
   return (
     <>
       <AppBar position='static' sx={{ backgroundColor: "var(--main)" }}>
@@ -27,9 +35,9 @@ const Navbar = () => {
                 cursor: "pointer",
                 display: onQuiz && "none",
               }}
-              onClick={() => history.push("/highscores")}
+              onClick={handleClick}
             >
-              View highscores
+              {location.pathname === "/highscores" ? "Home" : "View highscores"}
             </Typography>
             <Typography variant='h6' component='div'>
               Time: {seconds}s

@@ -25,7 +25,7 @@ import { useHistory } from "react-router-dom";
 import { useGlobalContext } from "../Context";
 
 const Quiz = () => {
-  const { setPauseTimer, seconds, setSeconds } = useGlobalContext();
+  const { setPauseTimer, seconds, setSeconds, setOnQuiz } = useGlobalContext();
   const history = useHistory();
 
   //mui
@@ -45,6 +45,9 @@ const Quiz = () => {
   const [incorrectCount, setIncorrectCount] = useState(0);
   const [gameEnd, setGameEnd] = useState(false);
   const [name, setName] = useState("");
+  const [add, setAdd] = useState(false);
+  const [btnState, setBtnState] = useState("add score");
+  const [inputErr, setInputErr] = useState(false);
 
   //functions
   const handleShuffle = (optionss) => {
@@ -55,7 +58,7 @@ const Quiz = () => {
     setPauseTimer(true);
     setLoading(true);
     const data = await fetch(
-      "https://opentdb.com/api.php?amount=3&category=18&difficulty=easy&type=multiple"
+      "https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=multiple"
     );
     const res = await data.json();
     setQuestions(handleShuffle(res.results));
@@ -88,7 +91,8 @@ const Quiz = () => {
     }
     if (button === "next question") {
       setPauseTimer(false);
-      if (currentQues > 1) {
+      if (currentQues > 8) {
+        setOnQuiz(false);
         setPauseTimer(true);
         setGameEnd(true);
         return;
@@ -109,6 +113,32 @@ const Quiz = () => {
 
   const handleClickEnd = () => {
     history.push("/");
+  };
+
+  const handleAdd = async () => {
+    if (name === "") {
+      setInputErr(true);
+    }
+    if (btnState === "add score" && name !== "") {
+      setInputErr(false);
+      setAdd(true);
+      const data = await fetch("http://localhost:8000/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: uuidv4(),
+          name,
+          incorrect: incorrectCount,
+          correct: 10 - incorrectCount,
+          time: seconds,
+        }),
+      });
+      setAdd(false);
+      setBtnState("view highscores");
+    }
+    if (btnState === "view highscores") {
+      history.push("/highscores");
+    }
   };
 
   //hooks
@@ -144,6 +174,7 @@ const Quiz = () => {
               label='Name'
               variant='standard'
               onChange={(e) => setName(e.target.value)}
+              error={inputErr}
             />
 
             <TableContainer component={Paper}>
@@ -165,7 +196,7 @@ const Quiz = () => {
                     </TableCell>
                     <TableCell>{incorrectCount}</TableCell>
                     <TableCell>{10 - incorrectCount}</TableCell>
-                    <TableCell>{seconds}s</TableCell>
+                    <TableCell>{seconds}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -174,14 +205,14 @@ const Quiz = () => {
             <Box sx={{ display: "flex", gap: "20px" }}>
               <Button
                 variant='contained'
-                onClick={() => history.push("/highscores")}
+                onClick={handleAdd}
                 sx={{
                   backgroundColor: "var(--main)",
                   display: "block",
                   "&:hover": { backgroundColor: "var(--main)" },
                 }}
               >
-                add score
+                {add ? "adding..." : btnState}
               </Button>
               <Button
                 variant='contained'
@@ -220,8 +251,12 @@ const Quiz = () => {
               gap: 2,
               width: "100%",
               maxWidth: "700px",
+              position: "relative",
             }}
           >
+            <Typography sx={{ position: "absolute", right: 10, top: 10 }}>
+              {currentQues + 1}
+            </Typography>
             <Typography variant={`${Xsmall ? "h5" : "h4"}`} fontWeight='600'>
               {questions[currentQues].question}
             </Typography>
