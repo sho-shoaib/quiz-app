@@ -58,7 +58,7 @@ const Quiz = () => {
     setPauseTimer(true);
     setLoading(true);
     const data = await fetch(
-      "https://opentdb.com/api.php?amount=3&category=18&difficulty=easy&type=multiple"
+      "https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=multiple"
     );
     const res = await data.json();
     setQuestions(handleShuffle(res.results));
@@ -91,7 +91,7 @@ const Quiz = () => {
     }
     if (button === "next question") {
       setPauseTimer(false);
-      if (currentQues > 1) {
+      if (currentQues > 8) {
         setOnQuiz(false);
         setPauseTimer(true);
         setGameEnd(true);
