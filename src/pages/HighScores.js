@@ -27,10 +27,15 @@ const HighScores = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    const data = await fetch("http://localhost:8000/scores");
+    const data = await fetch("http://localhost:8000/api/v1/highscore", {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
     const res = await data.json();
-    console.log(res.sort(compare));
-    setScores(res.sort(compare));
+    console.log(res.data.scores.sort(compare));
+    setScores(res.data.scores.sort(compare));
     setLoading(false);
   };
 

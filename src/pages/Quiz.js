@@ -58,7 +58,7 @@ const Quiz = () => {
     setPauseTimer(true);
     setLoading(true);
     const data = await fetch(
-      "https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=multiple"
+      "https://opentdb.com/api.php?amount=3&category=18&difficulty=easy&type=multiple"
     );
     const res = await data.json();
     setQuestions(handleShuffle(res.results));
@@ -91,7 +91,7 @@ const Quiz = () => {
     }
     if (button === "next question") {
       setPauseTimer(false);
-      if (currentQues > 8) {
+      if (currentQues > 1) {
         setOnQuiz(false);
         setPauseTimer(true);
         setGameEnd(true);
@@ -122,7 +122,7 @@ const Quiz = () => {
     if (btnState === "add score" && name !== "") {
       setInputErr(false);
       setAdd(true);
-      const data = await fetch("http://localhost:8000/scores", {
+      const data = await fetch("http://localhost:8000/api/v1/highscore", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
