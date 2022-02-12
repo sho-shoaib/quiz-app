@@ -34,8 +34,7 @@ const HighScores = () => {
       },
     });
     const res = await data.json();
-    console.log(res.data.scores.sort(compare));
-    setScores(res.data.scores.sort(compare));
+    setScores(res.data.sort(compare));
     setLoading(false);
   };
 
@@ -65,10 +64,10 @@ const HighScores = () => {
             </TableHead>
             <TableBody>
               {scores.map((score) => {
-                const { name, time, correct, incorrect, id } = score;
+                const { name, time, correct, incorrect, _id } = score;
                 return (
                   <TableRow
-                    key={id}
+                    key={_id}
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell component='th' scope='row'>

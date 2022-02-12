@@ -1,13 +1,8 @@
-import fs from "fs";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const data = JSON.parse(fs.readFileSync(`${__dirname}/../data/data.json`));
+import { Highscore } from "../model/highscoreModel.js";
 
 export const getHighScores = async (req, res) => {
+  const data = await Highscore.find();
+
   try {
     res.status(200).json({
       status: "success",
@@ -23,15 +18,7 @@ export const getHighScores = async (req, res) => {
 
 export const addHighscore = async (req, res) => {
   try {
-    const newData = { scores: [...data.scores, req.body] };
-
-    fs.writeFileSync(
-      `${__dirname}/../data/data.json`,
-      JSON.stringify(newData),
-      (err) => {
-        if (err) console.log(err);
-      }
-    );
+    await Highscore.create(req.body);
 
     res.status(201).json({
       status: "success",

@@ -126,7 +126,6 @@ const Quiz = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id: uuidv4(),
           name,
           incorrect: incorrectCount,
           correct: 10 - incorrectCount,
